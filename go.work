@@ -1,7 +1,11 @@
 go 1.25.0
 
 use (
+	.
 	./api-gateway
 	./auth-service
+	./notification-service
+	./order-service
+	./payment-service
 	./user-service
 )
