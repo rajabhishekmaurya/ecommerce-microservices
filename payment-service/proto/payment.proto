@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package payment;
+
+option go_package = "github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/proto;payment";
+
+service PaymentService {
+    rpc ProcessPayment(PaymentRequest) returns (PaymentResponse);
+}
+
+message PaymentRequest {
+    string order_id = 1;
+    double amount = 2;
+}
+
+message PaymentResponse {
+    bool success = 1;
+    string transaction_id = 2;
+}
