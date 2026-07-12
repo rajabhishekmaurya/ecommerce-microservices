@@ -28,7 +28,7 @@ func New() *Server {
 	e.Use(echoMiddleware.Recover())
 	e.Use(customMiddleware.RequestID)
 
-	handler.Register(e)
+	handler.Register(e, cfg)
 
 	return &Server{
 		echo: e,

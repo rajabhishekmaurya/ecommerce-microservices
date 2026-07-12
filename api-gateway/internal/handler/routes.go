@@ -1,10 +1,19 @@
 package handler
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/labstack/echo/v4"
 
-func Register(e *echo.Echo) {
+	"github.com/rajabhishekmaurya/ecommerce-microservices/api-gateway/internal/config"
+)
 
-	e.GET("/", Health)
+func Register(e *echo.Echo, cfg *config.Config) {
+
 	e.GET("/health", Health)
+
+	auth := e.Group("/auth")
+	auth.Any("/*", ReverseProxy(cfg.AuthServiceURL, "/auth"))
+
+	users := e.Group("/users")
+	users.Any("/*", ReverseProxy(cfg.UserServiceURL, "/users"))
 
 }
