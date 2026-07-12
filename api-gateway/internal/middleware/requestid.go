@@ -6,12 +6,15 @@ import (
 )
 
 func RequestID(next echo.HandlerFunc) echo.HandlerFunc {
+
 	return func(c echo.Context) error {
 
-		requestID := uuid.New().String()
+		id := uuid.New().String()
 
-		c.Response().Header().Set("X-Request-ID", requestID)
+		c.Response().Header().Set("X-Request-ID", id)
 
 		return next(c)
+
 	}
+
 }

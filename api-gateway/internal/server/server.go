@@ -21,13 +21,14 @@ func New() *Server {
 	cfg := config.Load()
 
 	e := echo.New()
+
 	e.HideBanner = true
 
 	e.Use(echoMiddleware.Logger())
 	e.Use(echoMiddleware.Recover())
 	e.Use(customMiddleware.RequestID)
 
-	handler.RegisterRoutes(e)
+	handler.Register(e)
 
 	return &Server{
 		echo: e,
@@ -36,6 +37,9 @@ func New() *Server {
 }
 
 func (s *Server) Start() error {
-	log.Printf("%s started on :%s", s.cfg.AppName, s.cfg.Port)
+
+	log.Printf("%s listening on %s", s.cfg.AppName, s.cfg.Port)
+
 	return s.echo.Start(":" + s.cfg.Port)
+
 }
