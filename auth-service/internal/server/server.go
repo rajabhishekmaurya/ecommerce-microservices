@@ -8,6 +8,8 @@ import (
 
 	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/config"
 	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/handler"
+	commonmiddleware "github.com/rajabhishekmaurya/ecommerce-microservices/common/middleware"
+	"github.com/rajabhishekmaurya/ecommerce-microservices/common/monitoring"
 )
 
 type Server struct {
@@ -25,6 +27,10 @@ func New() *Server {
 
 	e.Use(echoMiddleware.Logger())
 	e.Use(echoMiddleware.Recover())
+
+	e.Use(commonmiddleware.PrometheusMiddleware())
+
+	e.GET("/metrics", monitoring.Handler())
 
 	handler.RegisterRoutes(e, cfg)
 
