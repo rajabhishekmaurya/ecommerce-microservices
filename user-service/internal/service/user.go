@@ -1,71 +1,48 @@
 package service
 
 import (
-	"github.com/google/uuid"
+	"context"
+	"errors"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/rajabhishekmaurya/ecommerce-microservices/user-service/internal/model"
+	"github.com/rajabhishekmaurya/ecommerce-microservices/user-service/internal/repository"
 )
 
-var users []model.User
-
-func GetUsers() []model.User {
-	return users
+type UserService struct {
+	repo repository.UserRepository
 }
 
-func CreateUser(user model.User) model.User {
-
-	user.ID = uuid.New().String()
-
-	users = append(users, user)
-
-	return user
+func NewUserService(repo repository.UserRepository) *UserService {
+	return &UserService{
+		repo: repo,
+	}
 }
 
-func GetUser(id string) (model.User, bool) {
+func (s *UserService) Register(ctx context.Context, user *model.User) error {
 
-	for _, u := range users {
-
-		if u.ID == id {
-			return u, true
-		}
-
+	// Check if username already exists
+	existingUser, err := s.repo.GetByUsername(ctx, user.Username)
+	if err != nil {
+		return err
 	}
 
-	return model.User{}, false
-}
-
-func UpdateUser(id string, user model.User) bool {
-
-	for i := range users {
-
-		if users[i].ID == id {
-
-			user.ID = id
-
-			users[i] = user
-
-			return true
-
-		}
-
+	if existingUser != nil {
+		return errors.New("username already exists")
 	}
 
-	return false
-}
-
-func DeleteUser(id string) bool {
-
-	for i := range users {
-
-		if users[i].ID == id {
-
-			users = append(users[:i], users[i+1:]...)
-
-			return true
-
-		}
-
+	// Hash password
+	hashedPassword, err := bcrypt.GenerateFromPassword(
+		[]byte(user.Password),
+		bcrypt.DefaultCost,
+	)
+	if err != nil {
+		return err
 	}
 
-	return false
+	user.Password = string(hashedPassword)
+
+	// Save user
+	return s.repo.Create(ctx, user)
 }

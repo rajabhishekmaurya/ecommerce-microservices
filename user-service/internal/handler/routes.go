@@ -2,13 +2,12 @@ package handler
 
 import "github.com/labstack/echo/v4"
 
-func RegisterRoutes(e *echo.Echo) {
+func RegisterRoutes(
+	e *echo.Echo,
+	userHandler *UserHandler,
+) {
 
-	e.GET("/health", Health)
+	e.GET("/health", userHandler.Health)
 
-	e.POST("/users", CreateUser)
-	e.GET("/users", GetUsers)
-	e.GET("/users/:id", GetUser)
-	e.PUT("/users/:id", UpdateUser)
-	e.DELETE("/users/:id", DeleteUser)
+	e.POST("/users", userHandler.Register)
 }

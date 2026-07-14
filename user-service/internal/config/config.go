@@ -9,20 +9,37 @@ import (
 type Config struct {
 	AppName string
 	Port    string
+
+	DBHost     string
+	DBPort     string
+	DBUser     string
+	DBPassword string
+	DBName     string
 }
 
 func Load() *Config {
 
 	_ = godotenv.Load()
 
-	cfg := &Config{
-		AppName: os.Getenv("APP_NAME"),
-		Port:    os.Getenv("PORT"),
+	return &Config{
+		AppName: getEnv("APP_NAME", "user-service"),
+		Port:    getEnv("PORT", "8082"),
+
+		DBHost:     getEnv("DB_HOST", "localhost"),
+		DBPort:     getEnv("DB_PORT", "3306"),
+		DBUser:     getEnv("DB_USER", "user"),
+		DBPassword: getEnv("DB_PASSWORD", "password"),
+		DBName:     getEnv("DB_NAME", "userdb"),
+	}
+}
+
+func getEnv(key, defaultValue string) string {
+
+	value := os.Getenv(key)
+
+	if value == "" {
+		return defaultValue
 	}
 
-	if cfg.Port == "" {
-		cfg.Port = "8082"
-	}
-
-	return cfg
+	return value
 }
