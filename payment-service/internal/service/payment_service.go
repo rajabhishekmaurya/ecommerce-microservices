@@ -9,11 +9,13 @@ import (
 	pb "github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/proto"
 )
 
-type PaymentServer struct {
-	pb.UnimplementedPaymentServiceServer
+type PaymentService struct{}
+
+func NewPaymentService() *PaymentService {
+	return &PaymentService{}
 }
 
-func (s *PaymentServer) ProcessPayment(ctx context.Context, req *pb.PaymentRequest) (*pb.PaymentResponse, error) {
+func (s *PaymentService) ProcessPayment(ctx context.Context, req *pb.PaymentRequest) (*pb.PaymentResponse, error) {
 
 	fmt.Println("========== PAYMENT SERVICE ==========")
 	fmt.Println("Order ID :", req.OrderId)

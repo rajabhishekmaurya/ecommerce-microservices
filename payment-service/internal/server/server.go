@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/internal/config"
+	"github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/internal/handler"
 	"github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/internal/service"
 
 	pb "github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/proto"
@@ -23,7 +24,6 @@ func New() *Server {
 }
 
 func (s *Server) Start() error {
-
 	lis, err := net.Listen("tcp", ":"+s.cfg.Port)
 	if err != nil {
 		return err
@@ -31,9 +31,12 @@ func (s *Server) Start() error {
 
 	grpcServer := grpc.NewServer()
 
+	paymentService := service.NewPaymentService()
+	paymentHandler := handler.NewPaymentHandler(paymentService)
+
 	pb.RegisterPaymentServiceServer(
 		grpcServer,
-		&service.PaymentServer{},
+		paymentHandler,
 	)
 
 	log.Printf("Payment Service listening on :%s", s.cfg.Port)
