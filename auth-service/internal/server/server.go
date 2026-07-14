@@ -8,6 +8,7 @@ import (
 
 	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/config"
 	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/handler"
+	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/service"
 	commonmiddleware "github.com/rajabhishekmaurya/ecommerce-microservices/common/middleware"
 	"github.com/rajabhishekmaurya/ecommerce-microservices/common/monitoring"
 )
@@ -32,7 +33,11 @@ func New() *Server {
 
 	e.GET("/metrics", monitoring.Handler())
 
-	handler.RegisterRoutes(e, cfg)
+	authService := service.NewAuthService(cfg)
+
+	authHandler := handler.NewAuthHandler(cfg, authService)
+
+	handler.RegisterRoutes(e, authHandler)
 
 	return &Server{
 		echo: e,

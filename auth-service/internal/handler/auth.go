@@ -1,28 +1,30 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
-	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 
 	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/config"
+	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/model"
+	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/service"
 )
 
 type AuthHandler struct {
-	cfg *config.Config
+	cfg     *config.Config
+	service *service.AuthService
 }
 
-func NewAuthHandler(cfg *config.Config) *AuthHandler {
+func NewAuthHandler(
+	cfg *config.Config,
+	service *service.AuthService,
+) *AuthHandler {
+
 	return &AuthHandler{
-		cfg: cfg,
+		cfg:     cfg,
+		service: service,
 	}
-}
-
-type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
 }
 
 func (h *AuthHandler) Health(c echo.Context) error {
@@ -41,39 +43,25 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	})
 
 }
-
 func (h *AuthHandler) Login(c echo.Context) error {
 
-	req := new(LoginRequest)
+	req := new(model.LoginRequest)
 
 	if err := c.Bind(req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	// Dummy validation
-	if req.Username != "admin" || req.Password != "admin123" {
-
-		return c.JSON(http.StatusUnauthorized, map[string]string{
-			"message": "Invalid Username or Password",
-		})
-
-	}
-
-	claims := jwt.MapClaims{
-		"username": req.Username,
-		"exp":      time.Now().Add(time.Hour).Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString([]byte(h.cfg.JWTSecret))
-
+	resp, err := h.service.Login(req)
 	if err != nil {
+
+		if errors.Is(err, service.ErrInvalidCredentials) {
+			return c.JSON(http.StatusUnauthorized, map[string]string{
+				"message": err.Error(),
+			})
+		}
+
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{
-		"token": tokenString,
-	})
-
+	return c.JSON(http.StatusOK, resp)
 }
