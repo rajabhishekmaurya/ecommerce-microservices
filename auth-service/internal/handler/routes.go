@@ -1,15 +1,10 @@
 package handler
 
-import (
-	"github.com/labstack/echo/v4"
-)
+import "github.com/labstack/echo/v4"
 
-func RegisterRoutes(e *echo.Echo, auth *AuthHandler) {
+func RegisterRoutes(e *echo.Echo, authHandler *AuthHandler) {
 
-	e.GET("/health", auth.Health)
+	e.GET("/health", authHandler.Health)
 
-	e.POST("/register", auth.Register)
-
-	e.POST("/login", auth.Login)
-
+	e.POST("/login", authHandler.Login)
 }

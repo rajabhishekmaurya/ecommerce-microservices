@@ -1,44 +1,76 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-
 	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/config"
-	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/model"
+	"github.com/rajabhishekmaurya/ecommerce-microservices/auth-service/internal/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-	cfg *config.Config
+	repo repository.UserRepository
+	cfg  *config.Config
+}
+type LoginRequest struct {
+	Username string
+	Password string
+}
+type LoginResponse struct {
+	Token string
 }
 
-func NewAuthService(cfg *config.Config) *AuthService {
+func NewAuthService(repo repository.UserRepository, cfg *config.Config) *AuthService {
+
 	return &AuthService{
-		cfg: cfg,
+		repo: repo,
+		cfg:  cfg,
 	}
 }
 
-func (s *AuthService) Login(req *model.LoginRequest) (*model.LoginResponse, error) {
+func (s *AuthService) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
 
-	// Dummy validation
-	if req.Username != "admin" || req.Password != "admin123" {
-		return nil, ErrInvalidCredentials
-	}
-
-	claims := jwt.MapClaims{
-		"username": req.Username,
-		"exp":      time.Now().Add(time.Hour).Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString([]byte(s.cfg.JWTSecret))
+	user, err := s.repo.GetByUsername(ctx, req.Username)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.LoginResponse{
+	if user == nil {
+		return nil, errors.New("invalid username or password")
+	}
+
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(user.Password),
+		[]byte(req.Password),
+	)
+
+	if err != nil {
+		return nil, errors.New("invalid username or password")
+	}
+
+	claims := jwt.MapClaims{
+		"user_id":  user.ID,
+		"username": user.Username,
+		"exp":      time.Now().Add(time.Hour).Unix(),
+	}
+
+	token := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		claims,
+	)
+
+	tokenString, err := token.SignedString(
+		[]byte(s.cfg.JWTSecret),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &LoginResponse{
 		Token: tokenString,
 	}, nil
 }

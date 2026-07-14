@@ -40,6 +40,7 @@ func (h *UserHandler) Register(c echo.Context) error {
 			"error": err.Error(),
 		})
 	}
+	user.Password = "*****"
 
 	return c.JSON(http.StatusCreated, user)
 }
