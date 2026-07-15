@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package payment;
 
-option go_package = "github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/proto;payment";
+option go_package = "github.com/rajabhishekmaurya/ecommerce-microservices/common/proto/payment;payment";
 
 service PaymentService {
     rpc ProcessPayment(PaymentRequest) returns (PaymentResponse);

@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rajabhishekmaurya/ecommerce-microservices/order-service/internal/config"
 	"github.com/rajabhishekmaurya/ecommerce-microservices/order-service/internal/model"
 	"github.com/rajabhishekmaurya/ecommerce-microservices/order-service/internal/repository"
 )
@@ -13,11 +14,12 @@ import (
 type OrderService struct {
 	repo          *repository.OrderRepository
 	paymentClient *PaymentClient
+	cfg           *config.Config
 }
 
-func NewOrderService() (*OrderService, error) {
+func NewOrderService(cfg *config.Config) (*OrderService, error) {
 
-	paymentClient, err := NewPaymentClient()
+	paymentClient, err := NewPaymentClient(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -25,6 +27,7 @@ func NewOrderService() (*OrderService, error) {
 	return &OrderService{
 		repo:          repository.NewOrderRepository(),
 		paymentClient: paymentClient,
+		cfg:           cfg,
 	}, nil
 }
 

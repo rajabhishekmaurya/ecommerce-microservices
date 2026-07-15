@@ -8,8 +8,10 @@ import (
 
 type Config struct {
 	AppName string
-	KafkaBroker string
-	KafkaTopic string
+
+	KafkaBroker  string
+	KafkaTopic   string
+	KafkaGroupID string
 }
 
 func Load() *Config {
@@ -17,9 +19,11 @@ func Load() *Config {
 	_ = godotenv.Load()
 
 	cfg := &Config{
-		AppName:     os.Getenv("APP_NAME"),
-		KafkaBroker: os.Getenv("KAFKA_BROKER"),
-		KafkaTopic:  os.Getenv("KAFKA_TOPIC"),
+		AppName: os.Getenv("APP_NAME"),
+
+		KafkaBroker:  os.Getenv("KAFKA_BROKER"),
+		KafkaTopic:   os.Getenv("KAFKA_TOPIC"),
+		KafkaGroupID: os.Getenv("KAFKA_GROUP_ID"),
 	}
 
 	if cfg.AppName == "" {

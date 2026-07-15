@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 
+	pb "github.com/rajabhishekmaurya/ecommerce-microservices/common/proto/payment"
 	"github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/internal/service"
-	pb "github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/proto"
 )
 
 type PaymentHandler struct {

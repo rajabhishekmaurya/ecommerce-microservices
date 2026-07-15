@@ -10,7 +10,7 @@ import (
 	"github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/internal/handler"
 	"github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/internal/service"
 
-	pb "github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/proto"
+	pb "github.com/rajabhishekmaurya/ecommerce-microservices/common/proto/payment"
 )
 
 type Server struct {

@@ -20,7 +20,7 @@ func New() (*Server, error) {
 
 	cfg := config.Load()
 
-	orderService, err := service.NewOrderService()
+	orderService, err := service.NewOrderService(cfg)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,8 @@ import (
 	"context"
 	"time"
 
-	pb "github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/proto"
+	pb "github.com/rajabhishekmaurya/ecommerce-microservices/common/proto/payment"
+	"github.com/rajabhishekmaurya/ecommerce-microservices/order-service/internal/config"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -13,26 +14,29 @@ import (
 type PaymentClient struct {
 	client pb.PaymentServiceClient
 	conn   *grpc.ClientConn
+
+	cfg *config.Config
 }
 
-func NewPaymentClient() (*PaymentClient, error) {
+func NewPaymentClient(cfg *config.Config) (*PaymentClient, error) {
 
-	conn, err := grpc.NewClient(
-		"localhost:50051",
-		grpc.WithTransportCredentials(
-			insecure.NewCredentials(),
-		),
-	)
-	if err != nil {
-		return nil, err
-	}
+    conn, err := grpc.NewClient(
+        cfg.PaymentServiceAddr,
+        grpc.WithTransportCredentials(
+            insecure.NewCredentials(),
+        ),
+    )
+    if err != nil {
+        return nil, err
+    }
 
-	client := pb.NewPaymentServiceClient(conn)
+    client := pb.NewPaymentServiceClient(conn)
 
-	return &PaymentClient{
-		client: client,
-		conn:   conn,
-	}, nil
+    return &PaymentClient{
+        client: client,
+        conn:   conn,
+        cfg:    cfg,
+    }, nil
 }
 
 func (p *PaymentClient) ProcessPayment(orderID string, amount float64) (*pb.PaymentResponse, error) {

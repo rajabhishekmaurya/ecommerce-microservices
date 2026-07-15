@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	pb "github.com/rajabhishekmaurya/ecommerce-microservices/common/proto/payment"
 	"github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/internal/model"
-	pb "github.com/rajabhishekmaurya/ecommerce-microservices/payment-service/proto"
 )
 
 type PaymentService struct{}
